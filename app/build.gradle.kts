@@ -3,7 +3,8 @@ plugins {
     alias(libs.plugins.kotlin.android)
     alias(libs.plugins.kotlin.compose)
     alias(libs.plugins.hilt)
-    kotlin("kapt")
+    alias(libs.plugins.serialization)
+    alias(libs.plugins.ksp)
 }
 
 android {
@@ -29,20 +30,30 @@ android {
             )
         }
     }
+
     compileOptions {
-        sourceCompatibility = JavaVersion.VERSION_11
-        targetCompatibility = JavaVersion.VERSION_11
+        sourceCompatibility = JavaVersion.VERSION_1_8
+        targetCompatibility = JavaVersion.VERSION_1_8
+        isCoreLibraryDesugaringEnabled = true
     }
+
     kotlinOptions {
-        jvmTarget = "11"
+        jvmTarget = "1.8"
     }
+
     buildFeatures {
         compose = true
     }
 }
 
-dependencies {
+hilt{
+    enableAggregatingTask = false
+}
 
+dependencies {
+    coreLibraryDesugaring("com.android.tools:desugar_jdk_libs:2.0.4")
+
+    // Standard implementations
     implementation(libs.androidx.core.ktx)
     implementation(libs.androidx.lifecycle.runtime.ktx)
     implementation(libs.androidx.activity.compose)
@@ -51,6 +62,34 @@ dependencies {
     implementation(libs.androidx.ui.graphics)
     implementation(libs.androidx.ui.tooling.preview)
     implementation(libs.androidx.material3)
+
+    implementation(libs.navigation.compose)
+    implementation(libs.lifecycle.viewmodel)
+    implementation(libs.lifecycle.runtime.compose)
+    implementation(libs.coroutines.android)
+
+    // Hilt
+    implementation(libs.hilt.android)
+    implementation(libs.hilt.navigation.compose)
+    ksp(libs.hilt.compiler)
+
+    // Retrofit
+    implementation(libs.retrofit.core)
+    implementation(libs.retrofit.gson)
+    implementation(libs.okhttp.logging)
+
+    // Room
+    implementation(libs.room.runtime)
+    implementation(libs.room.ktx)
+    ksp(libs.room.compiler)
+
+    // Others
+    implementation(libs.coil.compose)
+    implementation(libs.datastore.preferences)
+    implementation(libs.serialization.json)
+    implementation(libs.accompanist.permissions)
+
+    // Testing
     testImplementation(libs.junit)
     androidTestImplementation(libs.androidx.junit)
     androidTestImplementation(libs.androidx.espresso.core)
@@ -58,49 +97,10 @@ dependencies {
     androidTestImplementation(libs.androidx.ui.test.junit4)
     debugImplementation(libs.androidx.ui.tooling)
     debugImplementation(libs.androidx.ui.test.manifest)
-
-    implementation(libs.navigation.compose)
-
-    // -------------------- Lifecycle + ViewModel --------------------
-    implementation(libs.lifecycle.viewmodel)
-    implementation(libs.lifecycle.runtime.compose)
-
-    // -------------------- Coroutines --------------------
-    implementation(libs.coroutines.android)
-
-    // -------------------- Hilt --------------------
-    implementation(libs.hilt.android)
-    kapt(libs.hilt.compiler)
-    implementation(libs.hilt.navigation.compose)
-
-    // -------------------- Retrofit + OkHttp --------------------
-    implementation(libs.retrofit.core)
-    implementation(libs.retrofit.gson)
-    implementation(libs.okhttp.logging)
-
-    // -------------------- Room --------------------
-    implementation(libs.room.runtime)
-    implementation(libs.room.ktx)
-    kapt(libs.room.compiler)
-
-    // -------------------- Coil --------------------
-    implementation(libs.coil.compose)
-
-    // -------------------- DataStore --------------------
-    implementation(libs.datastore.preferences)
-
-    // -------------------- Kotlin Serialization --------------------
-    implementation(libs.serialization.json)
-
-    // -------------------- Accompanist --------------------
-    implementation(libs.accompanist.permissions)
-    implementation(libs.accompanist.system.ui)
-
-    // -------------------- Testing --------------------
-    testImplementation(libs.junit)
-    androidTestImplementation(libs.androidx.junit)
-    androidTestImplementation(libs.androidx.espresso.core)
-    androidTestImplementation(platform(libs.androidx.compose.bom))
-    androidTestImplementation(libs.androidx.ui.test.junit4)
-
 }
+
+//configurations.all {
+//    resolutionStrategy {
+//        force("com.squareup:javapoet:1.13.0")
+//    }
+//}
