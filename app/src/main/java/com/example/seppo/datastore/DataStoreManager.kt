@@ -1,40 +1,33 @@
 package com.example.seppo.datastore
 
 import android.content.Context
-import androidx.datastore.preferences.core.Preferences
-import androidx.datastore.preferences.core.edit
-import androidx.datastore.preferences.core.longPreferencesKey
-import androidx.datastore.preferences.core.stringPreferencesKey
+import androidx.datastore.preferences.core.*
 import androidx.datastore.preferences.preferencesDataStore
+import dagger.hilt.android.qualifiers.ApplicationContext
+import javax.inject.Inject
+import javax.inject.Singleton
 import kotlinx.coroutines.flow.first
-import kotlinx.coroutines.flow.map
 
-private val Context.dataStore by preferencesDataStore(name = "seppo_prefs")
-class DataStoreManager(private val context: Context) {
-    companion object {
-        private val KEY_LAST_SENSOR_TOTAL = longPreferencesKey("last_sensor_total")
-        private val KEY_LAST_SAVED_DATE = stringPreferencesKey("last_saved_date")
-    }
+@Singleton
+class DataStoreManager @Inject constructor(
+    @ApplicationContext private val context: Context
+) {
+    private val Context.dataStore by preferencesDataStore(name = "step_prefs")
 
-    suspend fun getLastSensorTotal(): Long? {
-        val prefs = context.dataStore.data.first()
-        return prefs[KEY_LAST_SENSOR_TOTAL]
-    }
+    private val LAST_SENSOR_TOTAL = longPreferencesKey("last_sensor_total")
+    private val LAST_SAVED_DATE = stringPreferencesKey("last_saved_date")
+
+    suspend fun getLastSensorTotal(): Long? =
+        context.dataStore.data.first()[LAST_SENSOR_TOTAL]
 
     suspend fun setLastSensorTotal(value: Long) {
-        context.dataStore.edit { prefs ->
-            prefs[KEY_LAST_SENSOR_TOTAL] = value
-        }
+        context.dataStore.edit { it[LAST_SENSOR_TOTAL] = value }
     }
 
-    suspend fun getLastSavedDate(): String? {
-        val prefs = context.dataStore.data.first()
-        return prefs[KEY_LAST_SAVED_DATE]
-    }
+    suspend fun getLastSavedDate(): String? =
+        context.dataStore.data.first()[LAST_SAVED_DATE]
 
-    suspend fun setLastSavedDate(date: String) {
-        context.dataStore.edit { prefs ->
-            prefs[KEY_LAST_SAVED_DATE] = date
-        }
+    suspend fun setLastSavedDate(value: String) {
+        context.dataStore.edit { it[LAST_SAVED_DATE] = value }
     }
 }

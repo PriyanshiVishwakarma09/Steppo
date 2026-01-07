@@ -8,5 +8,4 @@ data class DailyStep(
     @PrimaryKey val date : String,
     val steps: Int
 )
-
-//daa class must provide all the properties inside the primary constructor not inside the class body
+//data class must provide all the properties inside the primary constructor not inside the class body

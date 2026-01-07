@@ -15,7 +15,6 @@ interface StepDao {
     @Query("SELECT * FROM daily_steps WHERE date = :date LIMIT 1")
     suspend fun getByDateOnce(date: String): DailyStep?
 
-
 //    Observes only the steps column for that date.
 //    Returns a Flow<Int?>, meaning:
 //    It emits updates automatically whenever the database changes.

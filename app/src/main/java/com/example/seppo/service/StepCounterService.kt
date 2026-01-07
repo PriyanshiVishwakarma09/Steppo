@@ -21,9 +21,7 @@ import com.example.seppo.util.NotificationHelper
 
 
 @AndroidEntryPoint
-
 class StepCounterService : Service(), SensorEventListener {
-
     @Inject lateinit var repository: StepRepository
     @Inject lateinit var dataStoreManager: DataStoreManager
 
@@ -100,7 +98,6 @@ class StepCounterService : Service(), SensorEventListener {
             // first run ever, store today's date
             dataStoreManager.setLastSavedDate(today)
         }
-
         // 2) If we have no lastSensorTotal -> initialize and return (no increment)
         if (lastSensorTotal == null) {
             dataStoreManager.setLastSensorTotal(sensorValue)
