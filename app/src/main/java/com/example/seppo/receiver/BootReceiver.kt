@@ -25,7 +25,6 @@ class BootReceiver : BroadcastReceiver() {
     }
 }
 
-
 //Without BootReceiver:
 //You restart phone → pedometer stops working until you manually open the app.
 //With BootReceiver:
