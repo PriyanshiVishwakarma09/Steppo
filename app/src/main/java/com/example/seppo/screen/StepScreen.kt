@@ -19,6 +19,10 @@ import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.shape.CircleShape
+import androidx.compose.foundation.shape.RoundedCornerShape
+import androidx.compose.material3.Card
+import androidx.compose.material3.CardDefaults
+import androidx.compose.material3.Scaffold
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
@@ -42,182 +46,222 @@ fun StepScreen(
     val dailyGoal = 10000
     val progress = (todaySteps / dailyGoal.toFloat()).coerceIn(0f, 1f)
 
-    Column(
-        modifier = Modifier
-            .fillMaxSize()
-            .background(Color.White)
-            .padding(horizontal = 16.dp)
-    ) {
+    val distanceKm = (todaySteps * 0.70f) / 1000
+    val timeMinutes = todaySteps / 120f
+    val calories = todaySteps * 0.04
 
-        // 🔹 Top Bar
-        Spacer(modifier = Modifier.height(24.dp))
-        TopBar()
-
-        Spacer(modifier = Modifier.height(24.dp))
-
-        // 🔹 Circular Progress
-        Box(
-            modifier = Modifier.fillMaxWidth(),
-            contentAlignment = Alignment.Center
-        ) {
-            CircularProgressBr(
-                steps = todaySteps,
-                percentage = progress
-            )
+    Scaffold(
+        containerColor = Color(0xFF1C1C1E),
+        topBar = {
+            TopBarDark()
         }
+    ) { paddingValues ->
 
-        Spacer(modifier = Modifier.height(24.dp))
+        Column(
+            modifier = Modifier
+                .fillMaxSize()
+                .padding(paddingValues)   // 🔥 VERY IMPORTANT
+                .padding(16.dp)
+        ) {
 
-        // 🔹 Stats Row
-        StatsRow(
-            distanceKm = 6.43,
-            calories = 3.43,
-            time = "1h 10m"
-        )
+            Spacer(modifier = Modifier.height(16.dp))
 
-        Spacer(modifier = Modifier.height(24.dp))
+            Card(
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .height(260.dp),
+                shape = RoundedCornerShape(20.dp),
+                colors = CardDefaults.cardColors(
+                    containerColor = Color(0xFF2C2C2E)
+                )
+            ) {
+                Box(
+                    modifier = Modifier
+                        .fillMaxSize(),
+                    contentAlignment = Alignment.Center
+                ) {
+                    CircularProgressImageStyle(
+                        steps = todaySteps,
+                        percentage = progress
+                    )
+                }
+            }
 
-        // 🔹 Schedule
-        ScheduleRow()
+            Spacer(modifier = Modifier.height(16.dp))
 
-        Spacer(modifier = Modifier.weight(1f))
+            CardContainer {
+                StatsRowImage(
+                    distanceKm = distanceKm,
+                    time = timeMinutes,
+                    calories = calories
+                )
+            }
 
+            Spacer(modifier = Modifier.height(20.dp))
+
+            WeeklyGoals()
+        }
     }
 }
 
 @Composable
-fun CircularProgressBr(
+fun TopBarDark() {
+    Box(
+        modifier = Modifier
+            .fillMaxWidth()
+            .height(56.dp),
+        contentAlignment = Alignment.Center
+    ) {
+        Text(
+            text = "Pedometer",
+            color = Color.White,
+            fontSize = 20.sp,
+            fontWeight = FontWeight.Bold
+        )
+    }
+}
+
+
+@Composable
+fun CardContainer(content: @Composable () -> Unit) {
+    Box(
+        modifier = Modifier
+            .fillMaxWidth()
+            .background(Color(0xFF2C2C2E), shape = androidx.compose.foundation.shape.RoundedCornerShape(20.dp))
+            .padding(20.dp)
+    ) {
+        content()
+    }
+}
+
+
+@Composable
+fun CircularProgressImageStyle(
     steps: Int,
-    percentage: Float,
-    radius: Dp = 120.dp,
-    strokeWidth: Dp = 14.dp
+    percentage: Float
 ) {
     val animatedProgress by animateFloatAsState(
         targetValue = percentage,
-        animationSpec = tween(1000)
+        animationSpec = tween(1200)
     )
 
     Box(
-        contentAlignment = Alignment.Center,
-        modifier = Modifier.size(radius * 2)
+        modifier = Modifier.size(240.dp),
+        contentAlignment = Alignment.Center
     ) {
-        Canvas(modifier = Modifier.size(radius * 2)) {
+        Canvas(modifier = Modifier.size(240.dp)) {
 
-            // Background ring
             drawArc(
-                color = Color(0xFFE6EEF6),
-                startAngle = 0f,
-                sweepAngle = 360f,
+                color = Color(0xFF2F2F31),
+                startAngle = 140f,
+                sweepAngle = 260f,
                 useCenter = false,
-                style = Stroke(width = strokeWidth.toPx())
+                style = Stroke(18.dp.toPx(), cap = StrokeCap.Round)
             )
 
-            // Progress ring
             drawArc(
-                color = Color(0xFF1E88E5),
-                startAngle = -90f,
-                sweepAngle = 360f * animatedProgress,
+                color = Color(0xFF3CE6C2),
+                startAngle = 140f,
+                sweepAngle = 260f * animatedProgress,
                 useCenter = false,
-                style = Stroke(
-                    width = strokeWidth.toPx(),
-                    cap = StrokeCap.Round
-                )
+                style = Stroke(18.dp.toPx(), cap = StrokeCap.Round)
             )
         }
 
         Column(horizontalAlignment = Alignment.CenterHorizontally) {
             Text(
                 text = steps.toString(),
-                fontSize = 36.sp,
-                fontWeight = FontWeight.Bold
+                fontSize = 32.sp,
+                fontWeight = FontWeight.Bold,
+                color = Color.White
             )
             Text(
                 text = "Steps",
-                fontSize = 16.sp,
+                fontSize = 14.sp,
                 color = Color.Gray
             )
         }
     }
 }
 
-@Composable
-fun TopBar() {
-    Row(
-        modifier = Modifier
-            .fillMaxWidth()
-            .padding(top = 12.dp),
-        verticalAlignment = Alignment.CenterVertically,
-        horizontalArrangement = Arrangement.SpaceBetween
-    ) {
-        Text(
-            text = "Pedometer",
-            fontSize = 20.sp,
-            fontWeight = FontWeight.Bold
-        )
-
-        Text(text = "👑")
-    }
-}
-
 
 @Composable
-fun StatsRow(
-    distanceKm: Double,
-    calories: Double,
-    time: String
+fun StatsRowImage(
+    distanceKm: Float,
+    time: Float,
+    calories: Double
 ) {
     Row(
         modifier = Modifier.fillMaxWidth(),
         horizontalArrangement = Arrangement.SpaceBetween
     ) {
-        StatItem("📍", "$distanceKm km", "Location")
-        StatItem("🔥", "$calories kcal", "Calories")
-        StatItem("⏱️", time, "Time")
+        StatItemImage("📍", String.format("%.2f km", distanceKm))
+        StatItemImage("⏱️", "${time.toInt()} min")
+        StatItemImage("🔥", "${calories.toInt()} kcal")
     }
 }
 
 @Composable
-fun StatItem(icon: String, value: String, label: String) {
+fun StatItemImage(icon: String, value: String) {
     Column(horizontalAlignment = Alignment.CenterHorizontally) {
         Text(text = icon, fontSize = 22.sp)
-        Text(text = value, fontWeight = FontWeight.Bold)
-        Text(text = label, fontSize = 12.sp, color = Color.Gray)
+        Text(text = value, color = Color.White, fontWeight = FontWeight.Bold)
     }
 }
 
+
 @Composable
-fun ScheduleRow() {
+fun WeeklyGoals() {
     Column {
         Text(
-            text = "Schedule",
+            text = "Weekly Goals",
+            color = Color.White,
             fontWeight = FontWeight.Bold
         )
 
-        Spacer(modifier = Modifier.height(8.dp))
+        Spacer(modifier = Modifier.height(12.dp))
 
         Row(
             modifier = Modifier.fillMaxWidth(),
             horizontalArrangement = Arrangement.SpaceBetween
         ) {
-            listOf("M", "T", "W", "T", "F", "S", "S").forEach {
-                Box(
-                    contentAlignment = Alignment.Center,
-                    modifier = Modifier
-                        .size(36.dp)
-                        .background(
-                            if (it == "T") Color(0xFF1E88E5) else Color.Transparent,
-                            shape = CircleShape
-                         )
-                ) {
-                    Text(
-                        text = it,
-                        color = if (it == "T") Color.White else Color.Gray
-                    )
-                }
+            listOf(
+                "Mon" to true,
+                "Tue" to false,
+                "Wed" to true,
+                "Thu" to true,
+                "Fri" to false,
+                "Sat" to false,
+                "Sun" to null
+            ).forEach { (day, status) ->
+                GoalDay(day, status)
             }
         }
     }
 }
 
+@Composable
+fun GoalDay(day: String, status: Boolean?) {
+    val color = when (status) {
+        true -> Color(0xFF3CE6C2)
+        false -> Color(0xFFFF5252)
+        null -> Color(0xFFFFC107)
+    }
 
-
+    Column(horizontalAlignment = Alignment.CenterHorizontally) {
+        Box(
+            modifier = Modifier
+                .size(28.dp)
+                .background(color, CircleShape),
+            contentAlignment = Alignment.Center
+        ) {
+            Text(
+                text = if (status == true) "✓" else if (status == false) "✕" else "⟳",
+                color = Color.Black,
+                fontSize = 14.sp
+            )
+        }
+        Spacer(modifier = Modifier.height(4.dp))
+        Text(text = day, fontSize = 12.sp, color = Color.Gray)
+    }
+}
